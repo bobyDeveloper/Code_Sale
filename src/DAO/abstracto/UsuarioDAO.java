@@ -4,6 +4,7 @@
  */
 package DAO.abstracto;
 
+import java.sql.SQLException;
 import modelo.Usuario;
 
 /**

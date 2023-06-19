@@ -23,7 +23,7 @@ public class Usuario extends javax.swing.JInternalFrame {
     public Usuario() {
         initComponents();
         this.setTitle("Nuevo usuario");
-        this.setSize(new Dimension(400,350));
+        this.setSize(new Dimension(400, 350));
     }
 
     /**
@@ -90,6 +90,11 @@ public class Usuario extends javax.swing.JInternalFrame {
                 txtApellidoPActionPerformed(evt);
             }
         });
+        txtApellidoP.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtApellidoPKeyTyped(evt);
+            }
+        });
         getContentPane().add(txtApellidoP, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 85, 170, -1));
 
         btnGuardar.setBackground(new java.awt.Color(0, 255, 255));
@@ -116,6 +121,11 @@ public class Usuario extends javax.swing.JInternalFrame {
                 txtNombreActionPerformed(evt);
             }
         });
+        txtNombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNombreKeyTyped(evt);
+            }
+        });
         getContentPane().add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 50, 170, -1));
 
         txtTelefono.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -124,12 +134,22 @@ public class Usuario extends javax.swing.JInternalFrame {
                 txtTelefonoActionPerformed(evt);
             }
         });
+        txtTelefono.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtTelefonoKeyTyped(evt);
+            }
+        });
         getContentPane().add(txtTelefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 225, 170, -1));
 
         txtApellidoM.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         txtApellidoM.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtApellidoMActionPerformed(evt);
+            }
+        });
+        txtApellidoM.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtApellidoMKeyTyped(evt);
             }
         });
         getContentPane().add(txtApellidoM, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 120, 170, -1));
@@ -191,13 +211,13 @@ public class Usuario extends javax.swing.JInternalFrame {
             //validamos si el usuario ya esta registrado
             modelo.Usuario usuario = new modelo.Usuario();
             Ctrl_Usuario controlUsuario = null;
-            
+
             try {
                 controlUsuario = new Ctrl_Usuario();
             } catch (SQLException ex) {
                 Logger.getLogger(Usuario.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
+
             if (!controlUsuario.existeUsuario(txtUsuario.getText().trim())) {
                 //enviamos datos del usuario
                 usuario.setNombre(txtNombre.getText().trim());
@@ -207,7 +227,7 @@ public class Usuario extends javax.swing.JInternalFrame {
                 usuario.setPassword(txtPassword.getText().trim());
                 usuario.setTelefono(txtTelefono.getText().trim());
                 usuario.setEstado(1);
-                
+
                 if (controlUsuario.guardar(usuario)) {
                     JOptionPane.showMessageDialog(null, "¡Usuario Registrado!");
                 } else {
@@ -219,6 +239,59 @@ public class Usuario extends javax.swing.JInternalFrame {
         }
         this.Limpiar();
     }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void txtNombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreKeyTyped
+        // TODO add your handling code here:
+
+        char c = evt.getKeyChar();
+
+        if (!Character.isLetter(c) && !Character.isWhitespace(c) && !Character.isISOControl(c)) {
+            JOptionPane.showMessageDialog(this, "Solo se permiten letras", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+            evt.consume();
+        }
+
+    }//GEN-LAST:event_txtNombreKeyTyped
+
+    private void txtApellidoPKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtApellidoPKeyTyped
+        // TODO add your handling code here:
+
+        char c = evt.getKeyChar();
+
+        if (!Character.isLetter(c) && !Character.isWhitespace(c) && !Character.isISOControl(c)) {
+            JOptionPane.showMessageDialog(this, "Solo se permiten letras", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+            evt.consume();
+        }
+
+    }//GEN-LAST:event_txtApellidoPKeyTyped
+
+    private void txtApellidoMKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtApellidoMKeyTyped
+        // TODO add your handling code here:
+
+        char c = evt.getKeyChar();
+
+        if (!Character.isLetter(c) && !Character.isWhitespace(c) && !Character.isISOControl(c)) {
+            JOptionPane.showMessageDialog(this, "Solo se permiten letras", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+            evt.consume();
+        }
+
+    }//GEN-LAST:event_txtApellidoMKeyTyped
+
+    private void txtTelefonoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTelefonoKeyTyped
+        // TODO add your handling code here:
+
+        char c = evt.getKeyChar();
+        if (!Character.isDigit(c) && !Character.isISOControl(c)) {
+            evt.consume();
+            JOptionPane.showMessageDialog(this, "Solo se permiten números enteros", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+        }
+
+        String text = txtTelefono.getText();
+        if (text.length() >= 10 && !Character.isISOControl(c)) {
+            evt.consume();
+            JOptionPane.showMessageDialog(this, "Solo se permiten 10 números enteros", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }//GEN-LAST:event_txtTelefonoKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -5,9 +5,11 @@
  */
 package Vista;
 
+import conexion.Conexion;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +20,9 @@ import javax.swing.JDesktopPane;
  * @author Ville
  */
 public class Menu extends javax.swing.JFrame {
+    
+    private static Conexion instancia = null;
+    private Connection cn = null;
     
     public static JDesktopPane jDesktopPane_Menu;
     
@@ -286,6 +291,9 @@ public class Menu extends javax.swing.JFrame {
 
     private void MenuCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuCerrarSesionActionPerformed
         this.dispose();
+        Login login = new Login();
+        login.setVisible(true);
+        
     }//GEN-LAST:event_MenuCerrarSesionActionPerformed
 
     private void MenuNuevaCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuNuevaCategoriaActionPerformed

@@ -106,4 +106,22 @@ public class CategoriaDAOImpl implements CategoriaDAO {
 
     }
 
+    @Override
+    public boolean tieneProductos(int idCategoria) {
+        boolean tieneProductos = false;
+        String sql = "SELECT COUNT(*) FROM tb_producto WHERE idCategoria = ?";
+        try {
+            PreparedStatement consulta = cn.prepareStatement(sql);
+            consulta.setInt(1, idCategoria);
+            ResultSet rs = consulta.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                tieneProductos = count > 0;
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al verificar si la categoría tiene productos: " + e);
+        }
+        return tieneProductos;
+    }
+
 }

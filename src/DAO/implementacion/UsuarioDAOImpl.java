@@ -28,7 +28,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public boolean guardar(Usuario objeto) {
-    boolean respuesta = false;
+        boolean respuesta = false;
         try {
             PreparedStatement consulta = cn.prepareStatement("insert into tb_usuario values(?,?,?,?,?,?,?,?)");
             consulta.setInt(1, 0);//id
@@ -50,7 +50,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public boolean existeUsuario(String usuario) {
-    boolean respuesta = false;
+        boolean respuesta = false;
         String sql = "select usuario from tb_usuario where usuario = '" + usuario + "';";
         Statement st;
         try {
@@ -68,29 +68,31 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     @Override
     public boolean loginUser(Usuario objeto) {
         boolean respuesta = false;
-        String sql = "select  usuario, password from tb_usuario where usuario = '" + objeto.getUsuario() + "' and password = '" + objeto.getPassword() + "'";
-        Statement st;
+        String sql = "SELECT usuario, password FROM tb_usuario WHERE BINARY usuario = ? AND BINARY password = ?";
         try {
-            st = cn.createStatement();
-            ResultSet rs = st.executeQuery(sql);
-            while (rs.next()) {
+            PreparedStatement statement = cn.prepareStatement(sql);
+            statement.setString(1, objeto.getUsuario());
+            statement.setString(2, objeto.getPassword());
+
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
                 respuesta = true;
             }
         } catch (SQLException e) {
-            System.out.println("Error al Iniciar Sesion");
-            JOptionPane.showMessageDialog(null, "Error al Iniciar Sesion");
+            System.out.println("Error al Iniciar Sesión");
+            JOptionPane.showMessageDialog(null, "Error al Iniciar Sesión");
         }
         return respuesta;
     }
 
     @Override
     public boolean actualizar(Usuario objeto, int idUsuario) {
-    boolean respuesta = false;
+        boolean respuesta = false;
         try {
 
             PreparedStatement consulta = cn.prepareStatement("update tb_usuario set nombre=?, apellidoPaterno = ?, apellidoMaterno = ?, usuario = ?, password= ?, telefono = ?, estado = ? where idUsuario ='" + idUsuario + "'");
             consulta.setString(1, objeto.getNombre());
-             consulta.setString(2, objeto.getApellidoPaterno());
+            consulta.setString(2, objeto.getApellidoPaterno());
             consulta.setString(3, objeto.getApellidoMaterno());
             consulta.setString(4, objeto.getUsuario());
             consulta.setString(5, objeto.getPassword());
@@ -109,7 +111,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public boolean eliminar(int idUsuario) {
-    boolean respuesta = false;
+        boolean respuesta = false;
         try {
             PreparedStatement consulta = cn.prepareStatement(
                     "delete from tb_usuario where idUsuario ='" + idUsuario + "'");
@@ -123,5 +125,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         }
         return respuesta;
     }
+
+    
 
 }

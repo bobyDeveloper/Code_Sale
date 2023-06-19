@@ -128,6 +128,11 @@ public class Producto extends javax.swing.JInternalFrame {
                 txtPrecioActionPerformed(evt);
             }
         });
+        txtPrecio.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtPrecioKeyTyped(evt);
+            }
+        });
         getContentPane().add(txtPrecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 110, 170, -1));
 
         txtCantidad.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -136,12 +141,22 @@ public class Producto extends javax.swing.JInternalFrame {
                 txtCantidadActionPerformed(evt);
             }
         });
+        txtCantidad.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtCantidadKeyTyped(evt);
+            }
+        });
         getContentPane().add(txtCantidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 80, 170, -1));
 
         txtNombre.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         txtNombre.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtNombreActionPerformed(evt);
+            }
+        });
+        txtNombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNombreKeyTyped(evt);
             }
         });
         getContentPane().add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 50, 170, -1));
@@ -193,7 +208,7 @@ public class Producto extends javax.swing.JInternalFrame {
             String categoria = "";
             iva = jComboBoxIVA.getSelectedItem().toString().trim();
             categoria = jComboBoxCategoria.getSelectedItem().toString().trim();
-            
+
             //validar campos
             if (txtNombre.getText().equals("") || txtCantidad.getText().equals("") || txtPrecio.getText().equals("")) {
                 JOptionPane.showMessageDialog(null, "Complete todos los campos");
@@ -219,7 +234,7 @@ public class Producto extends javax.swing.JInternalFrame {
                                 /*
                                 *Si el usuario ingresa , (coma) como punto decimal,
                                 lo transformamos a punto (.)
-                                */
+                                 */
                                 for (int i = 0; i < precioTXT.length(); i++) {
                                     if (precioTXT.charAt(i) == ',') {
                                         String precioNuevo = precioTXT.replace(",", ".");
@@ -234,34 +249,34 @@ public class Producto extends javax.swing.JInternalFrame {
                                     Precio = Double.parseDouble(precioTXT);
                                     producto.setPrecio(Precio);
                                 }
-                                
+
                                 producto.setDescripcion(txtDescripcion.getText().trim());
                                 //Porcentaje IVA
                                 if (iva.equalsIgnoreCase("SI")) {
                                     producto.setPorcentajeIva(16);
                                 } else if (iva.equalsIgnoreCase("NO")) {
                                     producto.setPorcentajeIva(0);
-                                } 
-                                
+                                }
+
                                 //idcategoria - cargar metodo que obtiene el id de categoria
                                 this.IdCategoria();
                                 producto.setIdCategoria(obtenerIdCategoriaCombo);
                                 producto.setEstado(1);
-                                
+
                                 if (controlProducto.guardar(producto)) {
                                     JOptionPane.showMessageDialog(null, "Registro Guardado");
                                     txtNombre.setBackground(Color.green);
                                     txtCantidad.setBackground(Color.green);
                                     txtPrecio.setBackground(Color.green);
                                     txtDescripcion.setBackground(Color.green);
-                                    
+
                                     this.CargarComboCategorias();
                                     this.jComboBoxIVA.setSelectedItem("Seleccione iva:");
                                     this.Limpiar();
                                 } else {
                                     JOptionPane.showMessageDialog(null, "Error al Guardar");
                                 }
-                                
+
                             } catch (HeadlessException | NumberFormatException e) {
                                 System.out.println("Error en: " + e);
                             }
@@ -275,6 +290,34 @@ public class Producto extends javax.swing.JInternalFrame {
             Logger.getLogger(Producto.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void txtNombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreKeyTyped
+        char c = evt.getKeyChar();
+
+        if (!Character.isLetter(c) && !Character.isWhitespace(c) && !Character.isISOControl(c)) {
+            JOptionPane.showMessageDialog(this, "Solo se permiten letras", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtNombreKeyTyped
+
+    private void txtCantidadKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCantidadKeyTyped
+        char c = evt.getKeyChar(); // Obtener el carácter ingresado por el usuario
+
+        // Verificar si el carácter es un dígito numérico
+        if (!Character.isDigit(c) && !Character.isISOControl(c)) {
+            // Si el carácter no es un dígito numérico ni un carácter de control, cancelar el evento y mostrar un mensaje de error
+            evt.consume(); // Cancelar el evento de teclado
+            JOptionPane.showMessageDialog(this, "Solo se permiten números enteros", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_txtCantidadKeyTyped
+
+    private void txtPrecioKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPrecioKeyTyped
+        char c = evt.getKeyChar();
+        if (!Character.isDigit(c) && c != '.' && !Character.isISOControl(c)) {
+            evt.consume();
+            JOptionPane.showMessageDialog(this, "Solo se permiten valores numericos", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_txtPrecioKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -321,8 +364,7 @@ public class Producto extends javax.swing.JInternalFrame {
             System.out.println("Error al cargar categorias");
         }
     }
-    
-    
+
     private int IdCategoria() {
         String sql = "select * from tb_categoria where descripcion = '" + this.jComboBoxCategoria.getSelectedItem() + "'";
         Statement st;

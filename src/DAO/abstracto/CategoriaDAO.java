@@ -19,5 +19,7 @@ public interface CategoriaDAO {
     public boolean actualizar(Categoria objeto, int idCategoria);
 
     public boolean eliminar(int idCategoria);
+    
+    public boolean tieneProductos(int idCategoria);
 
 }

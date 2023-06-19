@@ -4,10 +4,17 @@
  */
 package DAO.abstracto;
 
+import modelo.CabeceraVenta;
+import modelo.DetalleVenta;
+
 /**
  *
  * @author Ville
  */
 public interface VentaDAO {
-    
+
+    public boolean guardar(CabeceraVenta objeto);
+
+    public boolean guardarDetalle(DetalleVenta objeto);
+
 }

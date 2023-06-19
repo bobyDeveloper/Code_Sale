@@ -21,4 +21,5 @@ public interface ProductoDAO {
     public boolean eliminar(int idProducto);
 
     public boolean actualizarStock(Producto object, int idProducto);
+    
 }

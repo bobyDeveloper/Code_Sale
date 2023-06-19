@@ -38,6 +38,8 @@ public class GestionarCategoria extends javax.swing.JInternalFrame {
         this.setSize(new Dimension(600, 400));
         this.setTitle("Gestionar Categoria");
         this.CargarTablaCategorias();
+        jTableCategorias.setEnabled(false);
+        jTableCategorias.getTableHeader().setReorderingAllowed(false);
     }
 
     /**
@@ -143,25 +145,36 @@ public class GestionarCategoria extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+
         if (!txtDescripcion.getText().isEmpty()) {
             try {
                 modelo.Categoria categoria = new modelo.Categoria();
                 Ctrl_Categoria controlCategoria = new Ctrl_Categoria();
 
                 categoria.setDescripcion(txtDescripcion.getText().trim());
-                if (!controlCategoria.eliminar(idCategoria)) {
-                    JOptionPane.showMessageDialog(null, "Categoria Eliminada");
-                    txtDescripcion.setText("");
-                    this.CargarTablaCategorias();
+
+                // Check if there are products associated with the category
+                boolean tieneProductos = controlCategoria.tieneProductos(idCategoria);
+
+                if (tieneProductos) {
+                    JOptionPane.showMessageDialog(null, "No se puede eliminar la categoría. Tiene productos asociados.");
                 } else {
-                    JOptionPane.showMessageDialog(null, "Error al Eliminar Categoria");
+                    // No products associated, proceed with deletion
+                    if (!controlCategoria.eliminar(idCategoria)) {
+                        JOptionPane.showMessageDialog(null, "Categoría Eliminada");
+                        txtDescripcion.setText("");
+                        this.CargarTablaCategorias();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Error al Eliminar Categoría");
+                    }
                 }
             } catch (SQLException ex) {
                 Logger.getLogger(GestionarCategoria.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Seleccione una categoria");
+            JOptionPane.showMessageDialog(null, "Seleccione una categoría");
         }
+
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void txtDescripcionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescripcionActionPerformed
@@ -225,6 +238,9 @@ public class GestionarCategoria extends javax.swing.JInternalFrame {
                     fila[i] = rs.getObject(i + 1);
                 }
                 model.addRow(fila);
+
+                jTableCategorias.setEnabled(false);
+                jTableCategorias.getTableHeader().setReorderingAllowed(false);
             }
         } catch (SQLException e) {
             System.out.println("Error al llenar la tabla categorias: " + e);

@@ -4,9 +4,24 @@
  */
 package Vista;
 
+import conexion.Conexion;
+import controlador.Ctrl_Venta;
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import modelo.CabeceraVenta;
 
 /**
  *
@@ -14,13 +29,22 @@ import javax.swing.ImageIcon;
  */
 public class GestionarVenta extends javax.swing.JInternalFrame {
 
+    private Connection cn = null;
+    private int idCliente = 0;
+    private int idVenta;
+
     /**
      * Creates new form GestionarCategoria
      */
     public GestionarVenta() {
         initComponents();
+        cn = Conexion.getInstancia().getConexion();
         this.setSize(new Dimension(900, 500));
         this.setTitle("Gestionar venta");
+
+        this.CargarTablaVentas();
+        jTableVentas.setEnabled(false);
+        jTableVentas.getTableHeader().setReorderingAllowed(false);
 
         ImageIcon fondo = new ImageIcon("src/Img/fondo3.jpg");
         Icon icono = new ImageIcon(fondo.getImage().getScaledInstance(900, 500, WIDTH));
@@ -40,14 +64,12 @@ public class GestionarVenta extends javax.swing.JInternalFrame {
         jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jPanel2 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        jTableVentas = new javax.swing.JTable();
         jPanel3 = new javax.swing.JPanel();
-        jTextField1 = new javax.swing.JTextField();
+        txtFecha = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        txtTotal = new javax.swing.JTextField();
         Jfondo = new javax.swing.JLabel();
         jInternalFrame1 = new javax.swing.JInternalFrame();
         jLabel9 = new javax.swing.JLabel();
@@ -85,7 +107,7 @@ public class GestionarVenta extends javax.swing.JInternalFrame {
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        jTableVentas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -96,35 +118,24 @@ public class GestionarVenta extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(jTableVentas);
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 710, 250));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 830, 250));
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 730, 270));
-
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
-        jPanel2.setBorder(javax.swing.BorderFactory.createEtchedBorder());
-        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jButton1.setBackground(new java.awt.Color(51, 204, 0));
-        jButton1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jButton1.setText("Actualizar");
-        jPanel2.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 90, 25));
-
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 50, 130, 270));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 870, 270));
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jTextField1.setEnabled(false);
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+        txtFecha.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        txtFecha.setEnabled(false);
+        txtFecha.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
+                txtFechaActionPerformed(evt);
             }
         });
-        jPanel3.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 40, 170, -1));
+        jPanel3.add(txtFecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 40, 170, -1));
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -136,14 +147,14 @@ public class GestionarVenta extends javax.swing.JInternalFrame {
         jLabel6.setText("Fecha:");
         jPanel3.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 40, -1, -1));
 
-        jTextField2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jTextField2.setEnabled(false);
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+        txtTotal.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        txtTotal.setEnabled(false);
+        txtTotal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
+                txtTotalActionPerformed(evt);
             }
         });
-        jPanel3.add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 40, 170, -1));
+        jPanel3.add(txtTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 40, 170, -1));
 
         getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 330, 870, 100));
         getContentPane().add(Jfondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 890, 470));
@@ -284,9 +295,9 @@ public class GestionarVenta extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+    private void txtTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTotalActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField2ActionPerformed
+    }//GEN-LAST:event_txtTotalActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
@@ -312,15 +323,14 @@ public class GestionarVenta extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jComboBox4ActionPerformed
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+    private void txtFechaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFechaActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    }//GEN-LAST:event_txtFechaActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Jfondo;
     private javax.swing.JLabel Jfondo1;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JComboBox<String> jComboBox3;
@@ -337,20 +347,87 @@ public class GestionarVenta extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
-    private javax.swing.JScrollPane jScrollPane1;
+    private static javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private static javax.swing.JTable jTableVentas;
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField8;
+    private javax.swing.JTextField txtFecha;
+    private javax.swing.JTextField txtTotal;
     // End of variables declaration//GEN-END:variables
+ private void Limpiar() {
+        this.txtTotal.setText("");
+        this.txtFecha.setText("");
+    }
+
+    private void CargarTablaVentas() {
+        DefaultTableModel model = new DefaultTableModel();
+        String sql = "select cv.idCabeceraVenta as id, cv.valorPagar as total, cv.fechaVenta as fecha from tb_cabecera_venta as cv";
+        Statement st;
+        try {
+            st = cn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+            GestionarVenta.jTableVentas = new JTable(model);
+            GestionarVenta.jScrollPane1.setViewportView(GestionarVenta.jTableVentas);
+
+            model.addColumn("N°");//ID
+            model.addColumn("Total Pagar");
+            model.addColumn("Fecha Venta");
+
+            while (rs.next()) {
+                Object fila[] = new Object[3];
+                fila[0] = rs.getObject(1);
+                fila[1] = rs.getObject(2);
+                fila[2] = rs.getObject(3);
+                model.addRow(fila);
+
+                jTableVentas.setEnabled(false);
+                jTableVentas.getTableHeader().setReorderingAllowed(false);
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al llenar la tabla de ventas: " + e);
+        }
+        //evento para obtener campo al cual el usuario da click
+        //y obtener la interfaz que mostrara la informacion general
+        jTableVentas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int fila_point = jTableVentas.rowAtPoint(e.getPoint());
+                int columna_point = 0;
+
+                if (fila_point > -1) {
+                    idVenta = (int) model.getValueAt(fila_point, columna_point);
+                    EnviarDatosVentaSeleccionada(idVenta);//metodo
+                }
+            }
+        });
+    }
+
+
+    /*
+ * **************************************************
+ * Metodo que envia datos seleccionados
+ * **************************************************
+     */
+    private void EnviarDatosVentaSeleccionada(int idVenta) {
+        try {
+            PreparedStatement pst = cn.prepareStatement(
+                    "select cv.idCabeceraVenta, cv.valorPagar, cv.fechaVenta from tb_cabecera_venta as cv where cv.idCabeceraVenta = '" + idVenta + "'");
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                txtTotal.setText(rs.getString("valorPagar"));
+                txtFecha.setText(rs.getString("fechaVenta"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Error al seleccionar venta: " + e);
+        }
+    }
+
 }

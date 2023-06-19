@@ -90,6 +90,11 @@ public class ActualizarStock extends javax.swing.JInternalFrame {
                 txtStockNuevoActionPerformed(evt);
             }
         });
+        txtStockNuevo.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtStockNuevoKeyTyped(evt);
+            }
+        });
         getContentPane().add(txtStockNuevo, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 160, 170, -1));
 
         txtStockActual.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -97,6 +102,11 @@ public class ActualizarStock extends javax.swing.JInternalFrame {
         txtStockActual.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtStockActualActionPerformed(evt);
+            }
+        });
+        txtStockActual.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtStockActualKeyTyped(evt);
             }
         });
         getContentPane().add(txtStockActual, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 110, 170, -1));
@@ -149,7 +159,7 @@ public class ActualizarStock extends javax.swing.JInternalFrame {
                             Ctrl_Producto controlProducto = new Ctrl_Producto();
                             int stockActual = Integer.parseInt(txtStockActual.getText().trim());
                             int stockNuevo = Integer.parseInt(txtStockNuevo.getText().trim());
-                            
+
                             stockNuevo = stockActual + stockNuevo;
                             producto.setCantidad(stockNuevo);
                             if (controlProducto.actualizarStock(producto, idProducto)) {
@@ -181,6 +191,23 @@ public class ActualizarStock extends javax.swing.JInternalFrame {
     private void jComboBoxProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxProductoActionPerformed
         this.MostrarStock();
     }//GEN-LAST:event_jComboBoxProductoActionPerformed
+
+    private void txtStockActualKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtStockActualKeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtStockActualKeyTyped
+
+    private void txtStockNuevoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtStockNuevoKeyTyped
+
+        char c = evt.getKeyChar(); // Obtener el carácter ingresado por el usuario
+
+        // Verificar si el carácter es un díito numérico
+        if (!Character.isDigit(c) && !Character.isISOControl(c)) {
+            // Si el carácter no es un dígito numérico ni un carácter de control, cancelar el evento y mostrar un mensaje de error
+            evt.consume(); // Cancelar el evento de teclado
+            JOptionPane.showMessageDialog(this, "Solo se permiten números enteros", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }//GEN-LAST:event_txtStockNuevoKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

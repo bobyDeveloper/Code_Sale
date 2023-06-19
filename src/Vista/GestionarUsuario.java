@@ -39,6 +39,8 @@ public class GestionarUsuario extends javax.swing.JInternalFrame {
         this.setSize(new Dimension(900, 500));
         this.setTitle("Gestionar Usuarios");
         this.CargarTablaUsuarios();
+        jTableUsuarios.setEnabled(false);
+        jTableUsuarios.getTableHeader().setReorderingAllowed(false);
 
         ImageIcon fondo = new ImageIcon("src/Img/fondo3.jpg");
         Icon icono = new ImageIcon(fondo.getImage().getScaledInstance(900, 500, WIDTH));
@@ -148,6 +150,11 @@ public class GestionarUsuario extends javax.swing.JInternalFrame {
                 txt_apellidoMActionPerformed(evt);
             }
         });
+        txt_apellidoM.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txt_apellidoMKeyTyped(evt);
+            }
+        });
         jPanel3.add(txt_apellidoM, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 50, 170, -1));
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -184,12 +191,22 @@ public class GestionarUsuario extends javax.swing.JInternalFrame {
                 txt_telefonoActionPerformed(evt);
             }
         });
+        txt_telefono.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txt_telefonoKeyTyped(evt);
+            }
+        });
         jPanel3.add(txt_telefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 50, 170, -1));
 
         txt_contraseña.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         txt_contraseña.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_contraseñaActionPerformed(evt);
+            }
+        });
+        txt_contraseña.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txt_contraseñaKeyTyped(evt);
             }
         });
         jPanel3.add(txt_contraseña, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 60, 170, -1));
@@ -200,12 +217,22 @@ public class GestionarUsuario extends javax.swing.JInternalFrame {
                 txt_nombreActionPerformed(evt);
             }
         });
+        txt_nombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txt_nombreKeyTyped(evt);
+            }
+        });
         jPanel3.add(txt_nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 10, 170, -1));
 
         txt_apellidoP.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         txt_apellidoP.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_apellidoPActionPerformed(evt);
+            }
+        });
+        txt_apellidoP.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txt_apellidoPKeyTyped(evt);
             }
         });
         jPanel3.add(txt_apellidoP, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 10, 170, -1));
@@ -221,23 +248,42 @@ public class GestionarUsuario extends javax.swing.JInternalFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    public int NumUsuarios() throws SQLException {
+        int numeroUsuarios = 0;
+        // Crear la sentencia SQL para obtener el número de usuarios
+        String sql = "SELECT COUNT(*) AS totalUsuarios FROM tb_usuario";
+        // Ejecutar la consulta
+        Statement statement = cn.createStatement();
+        ResultSet resultSet = statement.executeQuery(sql);
+        // Obtener el resultado
+        if (resultSet.next()) {
+            numeroUsuarios = resultSet.getInt("totalUsuarios");
+        }
+        return numeroUsuarios;
+    }
+    
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         try {
             Ctrl_Usuario controlUsuario = new Ctrl_Usuario();
             if (idUsuario == 0) {
                 JOptionPane.showMessageDialog(null, "¡Seleccione un usuario!");
             } else {
-                if (!controlUsuario.eliminar(idUsuario)) {
-                    JOptionPane.showMessageDialog(null, "¡Usuario Eliminado!");
-                    this.CargarTablaUsuarios();
-                    this.Limpiar();
-                    idUsuario = 0;
+                int numeroUsuarios = NumUsuarios(); // Obtener el número de usuarios
+                if (numeroUsuarios == 1) { // Verificar si queda solo un usuario
+                    JOptionPane.showMessageDialog(null, "Error, debe existir al menos un usuario");
                 } else {
-                    JOptionPane.showMessageDialog(null, "¡Error al eliminar usuario!");
-                    this.Limpiar();
+                    if (!controlUsuario.eliminar(idUsuario)) {
+                        JOptionPane.showMessageDialog(null, "¡Usuario Eliminado!");
+                        this.CargarTablaUsuarios();
+                        this.Limpiar();
+                        idUsuario = 0;
+                    } else {
+                        JOptionPane.showMessageDialog(null, "¡Error al eliminar usuario!");
+                        this.Limpiar();
+                    }
                 }
             }
-        } catch (SQLException ex) {
+            }catch (SQLException ex) {
             Logger.getLogger(GestionarUsuario.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
@@ -295,7 +341,7 @@ public class GestionarUsuario extends javax.swing.JInternalFrame {
                 }
             }
         } catch (SQLException ex) {
-            System.out.println("Actualizar Usuario: "+ ex.getMessage());
+            System.out.println("Actualizar Usuario: " + ex.getMessage());
         }
 
 
@@ -304,6 +350,61 @@ public class GestionarUsuario extends javax.swing.JInternalFrame {
     private void txt_apellidoPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_apellidoPActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_apellidoPActionPerformed
+
+    private void txt_nombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_nombreKeyTyped
+        // TODO add your handling code here:
+
+        char c = evt.getKeyChar();
+
+        if (!Character.isLetter(c) && !Character.isWhitespace(c) && !Character.isISOControl(c)) {
+            JOptionPane.showMessageDialog(this, "Solo se permiten letras", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+            evt.consume();
+        }
+
+    }//GEN-LAST:event_txt_nombreKeyTyped
+
+    private void txt_contraseñaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_contraseñaKeyTyped
+        // TODO add your handling code here:
+
+    }//GEN-LAST:event_txt_contraseñaKeyTyped
+
+    private void txt_apellidoPKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_apellidoPKeyTyped
+        // TODO add your handling code here:
+
+        char c = evt.getKeyChar();
+
+        if (!Character.isLetter(c) && !Character.isWhitespace(c) && !Character.isISOControl(c)) {
+            JOptionPane.showMessageDialog(this, "Solo se permiten letras", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+            evt.consume();
+        }
+    }//GEN-LAST:event_txt_apellidoPKeyTyped
+
+    private void txt_apellidoMKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_apellidoMKeyTyped
+        // TODO add your handling code here:
+
+        char c = evt.getKeyChar();
+
+        if (!Character.isLetter(c) && !Character.isWhitespace(c) && !Character.isISOControl(c)) {
+            JOptionPane.showMessageDialog(this, "Solo se permiten letras", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+            evt.consume();
+        }
+    }//GEN-LAST:event_txt_apellidoMKeyTyped
+
+    private void txt_telefonoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txt_telefonoKeyTyped
+        // TODO add your handling code here:
+
+        char c = evt.getKeyChar();
+        if (!Character.isDigit(c) && !Character.isISOControl(c)) {
+            evt.consume();
+            JOptionPane.showMessageDialog(this, "Solo se permiten números enteros", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+        }
+
+        String text = txt_telefono.getText();
+        if (text.length() >= 10 && !Character.isISOControl(c)) {
+            evt.consume();
+            JOptionPane.showMessageDialog(this, "Solo se permiten 10 números enteros", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_txt_telefonoKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -364,6 +465,9 @@ public class GestionarUsuario extends javax.swing.JInternalFrame {
                     fila[i] = rs.getObject(i + 1);
                 }
                 model.addRow(fila);
+
+                jTableUsuarios.setEnabled(false);
+                jTableUsuarios.getTableHeader().setReorderingAllowed(false);
             }
         } catch (SQLException e) {
             System.out.println("Error al llenar la tabla usuarios: " + e);

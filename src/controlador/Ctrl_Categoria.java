@@ -45,4 +45,9 @@ public class Ctrl_Categoria {
         return categoriaDAO.eliminar(idCategoria);
     }
 
+    public boolean tieneProductos(int idCategoria) {
+        return categoriaDAO.tieneProductos(idCategoria);
+
+    }
+
 }

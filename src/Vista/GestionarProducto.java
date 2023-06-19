@@ -41,9 +41,11 @@ public class GestionarProducto extends javax.swing.JInternalFrame {
         initComponents();
         this.setSize(new Dimension(900, 500));
         this.setTitle("Gestionar productos");
-        
+
         this.CargarTablaProductos();
         this.CargarComboCategoria();
+        jTableProductos.setEnabled(false);
+        jTableProductos.getTableHeader().setReorderingAllowed(false);
 
         ImageIcon fondo = new ImageIcon("src/Img/fondo3.jpg");
         Icon icono = new ImageIcon(fondo.getImage().getScaledInstance(900, 500, WIDTH));
@@ -180,6 +182,11 @@ public class GestionarProducto extends javax.swing.JInternalFrame {
                 txtPrecioActionPerformed(evt);
             }
         });
+        txtPrecio.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtPrecioKeyTyped(evt);
+            }
+        });
         jPanel3.add(txtPrecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 10, 170, -1));
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -208,6 +215,11 @@ public class GestionarProducto extends javax.swing.JInternalFrame {
                 txtNombreActionPerformed(evt);
             }
         });
+        txtNombre.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtNombreKeyTyped(evt);
+            }
+        });
         jPanel3.add(txtNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 10, 170, -1));
 
         txtDescripcion.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -219,6 +231,7 @@ public class GestionarProducto extends javax.swing.JInternalFrame {
         jPanel3.add(txtDescripcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 60, 170, -1));
 
         txtCantidad.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        txtCantidad.setEnabled(false);
         txtCantidad.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtCantidadActionPerformed(evt);
@@ -402,7 +415,7 @@ public class GestionarProducto extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_btnBorrarActionPerformed
 
     private void txtPrecioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPrecioActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_txtPrecioActionPerformed
 
     private void txtNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreActionPerformed
@@ -457,7 +470,7 @@ public class GestionarProducto extends javax.swing.JInternalFrame {
             String categoria = "";
             iva = jComboBoxIVA.getSelectedItem().toString().trim();
             categoria = jComboBoxCategoria.getSelectedItem().toString().trim();
-            
+
             //validar campos
             if (txtNombre.getText().isEmpty() || txtCantidad.getText().isEmpty() || txtPrecio.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(null, "Complete todos los campos");
@@ -478,7 +491,7 @@ public class GestionarProducto extends javax.swing.JInternalFrame {
                             /*
                             *Si el usuario ingresa , (coma) como punto decimal,
                             lo transformamos a punto (.)
-                            */
+                             */
                             for (int i = 0; i < precioTXT.length(); i++) {
                                 if (precioTXT.charAt(i) == ',') {
                                     String precioNuevo = precioTXT.replace(",", ".");
@@ -493,20 +506,20 @@ public class GestionarProducto extends javax.swing.JInternalFrame {
                                 Precio = Double.parseDouble(precioTXT);
                                 producto.setPrecio(Precio);
                             }
-                            
+
                             producto.setDescripcion(txtDescripcion.getText().trim());
                             //Porcentaje IVA
                             if (iva.equalsIgnoreCase("Si")) {
                                 producto.setPorcentajeIva(16);
                             } else if (iva.equalsIgnoreCase("No")) {
                                 producto.setPorcentajeIva(0);
-                            } 
-                            
+                            }
+
                             //idcategoria - cargar metodo que obtiene el id de categoria
                             this.IdCategoria();
                             producto.setIdCategoria(obtenerIdCategoriaCombo);
                             producto.setEstado(1);
-                            
+
                             if (controlProducto.actualizar(producto, idProducto)) {
                                 JOptionPane.showMessageDialog(null, "Registro Actualizado");
                                 this.CargarComboCategoria();
@@ -526,6 +539,23 @@ public class GestionarProducto extends javax.swing.JInternalFrame {
             Logger.getLogger(GestionarProducto.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_btnActualizarActionPerformed
+
+    private void txtNombreKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreKeyTyped
+        char c = evt.getKeyChar();
+
+        if (!Character.isLetter(c) && !Character.isWhitespace(c) && !Character.isISOControl(c)) {
+            JOptionPane.showMessageDialog(this, "Solo se permiten letras", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+            evt.consume();
+        }
+    }//GEN-LAST:event_txtNombreKeyTyped
+
+    private void txtPrecioKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtPrecioKeyTyped
+        char c = evt.getKeyChar();
+        if (!Character.isDigit(c) && c != '.' && !Character.isISOControl(c)) {
+            evt.consume();
+            JOptionPane.showMessageDialog(this, "Solo se permiten valores numericos", "Error de entrada", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_txtPrecioKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -642,6 +672,9 @@ public class GestionarProducto extends javax.swing.JInternalFrame {
                     }
                 }
                 model.addRow(fila);
+
+                jTableProductos.setEnabled(false);
+                jTableProductos.getTableHeader().setReorderingAllowed(false);
             }
         } catch (SQLException e) {
             System.out.println("Error al llenar la tabla productos: " + e);
@@ -665,8 +698,12 @@ public class GestionarProducto extends javax.swing.JInternalFrame {
     private double calcularIva(double precio, int iva) {
         int p_iva = iva;
         switch (p_iva) {
-            case 1 -> IVA = precio * 0.16;
-            case 2 -> IVA = precio * 0.0;
+            case 0 ->
+                IVA = 0.0;
+            case 16 ->
+                IVA = precio * 0.16;
+            default -> {
+            }
         }
         //redondear decimales
         IVA = (double) Math.round(IVA * 100) / 100;
@@ -685,9 +722,12 @@ public class GestionarProducto extends javax.swing.JInternalFrame {
                 txtDescripcion.setText(rs.getString("descripcion"));
                 int iva = rs.getInt("porcentajeIva");
                 switch (iva) {
-                    case 16 -> jComboBoxIVA.setSelectedItem("SI");
-                    case 0 -> jComboBoxIVA.setSelectedItem("NO");
-                    default -> jComboBoxIVA.setSelectedItem("Seleccione iva:");
+                    case 16 ->
+                        jComboBoxIVA.setSelectedItem("SI");
+                    case 0 ->
+                        jComboBoxIVA.setSelectedItem("NO");
+                    default ->
+                        jComboBoxIVA.setSelectedItem("Seleccione iva:");
                 }
                 int idCate = rs.getInt("idCategoria");
                 jComboBoxCategoria.setSelectedItem(relacionarCategoria(idCate));
